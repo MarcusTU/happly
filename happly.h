@@ -33,103 +33,126 @@ SOFTWARE.
 
 
 // clang-format off
-/*
+ /*
 
- === Changelog ===
+  === Changelog ===
 
-  Significant changes to the file recorded here.
+   Significant changes to the file recorded here.
 
-  - Version 5 (Aug 22, 2020)      Minor: skip blank lines before properties in ASCII files
-  - Version 4 (Sep 11, 2019)      Change internal list format to be flat. Other small perf fixes and cleanup.
-  - Version 3 (Aug 1, 2019)       Add support for big endian and obj_info
-  - Version 2 (July 20, 2019)     Catch exceptions by const reference.
-  - Version 1 (undated)           Initial version. Unnamed changes before version numbering.
+   - Version 5 (Aug 22, 2020)      Minor: skip blank lines before properties in ASCII files
+   - Version 4 (Sep 11, 2019)      Change internal list format to be flat. Other small perf fixes and cleanup.
+   - Version 3 (Aug 1, 2019)       Add support for big endian and obj_info
+   - Version 2 (July 20, 2019)     Catch exceptions by const reference.
+   - Version 1 (undated)           Initial version. Unnamed changes before version numbering.
 
 
- === Fork log by MarcusTU ===
+  === Fork log by MarcusTU ===
 
-  [Initial copy of nmwsharp/happly]
+   [Initial copy of nmwsharp/happly]
 
-  [Changes from 07.05.2025 by MarcusTU]
+   [Changes from 07.05.2025 by MarcusTU]
 
-  [Added]
-  bool Element::hasListPropertyType
-  (const std::string& target)
-  [Reason]
-  There was no analogon to hasPropertyType for list properties
+   [Added]
+   bool Element::hasListPropertyType
+   (const std::string& target)
+   [Reason]
+   There was no analogon to hasPropertyType for list properties
 
-  [Added]
-  std::string PLYData::getPropertyTypeName
-  (const std::string & propertyName)
-  [Reason]
-  There was no possibility to get the property type name from the outside
+   [Added]
+   std::string PLYData::getPropertyTypeName
+   (const std::string & propertyName)
+   [Reason]
+   There was no possibility to get the property type name from the outside
 
-  [Added]
-  bool Element::isListProperty
-  (const std::string & propertyName)
-  [Reason]
-  There was no possibility to check if a property is a list property from the outside
+   [Added]
+   bool Element::isListProperty
+   (const std::string & propertyName)
+   [Reason]
+   There was no possibility to check if a property is a list property from the outside
 
-  [Added]
-  std::vector<std::array<double, 3>> PLYData::getVertexNormals
-  (const std::string& vertexElementName = "vertex")
-  [Reason]
-  There is a wrapper for positions (getVertexPositions) but the one for normals was missing
+   [Added]
+   template<typename PositionT> std::vector<std::array<double, 3>> PLYData::getVertexNormals
+   (const std::string& vertexElementName = "vertex")
+   [Reason]
+   There is a wrapper for positions (getVertexPositions) but the one for normals was missing
 
-  [Added]
-  void PLYData::addElementNormals
-  (std::string const& elementName, std::vector<std::array<PositionT, 3>>& elementNormals)
-  [Reason]
-  There is a wrapper for positions (addVertexPositions) but the one for normals was missing
+   [Added]
+   void PLYData::addElementNormals
+   (std::string const& elementName, std::vector<std::array<PositionT, 3>>& elementNormals)
+   [Reason]
+   There is a wrapper for positions (addVertexPositions) but the one for normals was missing
 
-  [Added]
-  void PLYData::addElementProperty
-  (std::vector<T> const & data, std::string const & elementName, std::string const & propertyName)
-  [Reason]
-  There was no wrapper for adding data to element properties in a smooth way
-		
-  [Added]
-  void PLYData::addElementListProperty
-  (std::vector<std::vector<T>> const & data, std::string const & elementName, std::string const & listPropertyName)
-  [Reason]
-  There was no wrapper for adding data to element list properties in a smooth way
+   [Added]
+   void PLYData::addElementProperty
+   (std::vector<T> const & data, std::string const & elementName, std::string const & propertyName)
+   [Reason]
+   There was no wrapper for adding data to element properties in a smooth way
 
-  [Changed]
-  void PLYData::addElementColors
-  (std::string const& elementName, std::vector<std::array<double, 3>>& colors)
-  [InsteadOf]
-  void PLYData::addVertexColors
-  (std::vector<std::array<double, 3>>& colors)
-  [Reason]
-  More general version of the same function that can set colors to any element and not only to vertices
+   [Added]
+   void PLYData::addElementListProperty
+   (std::vector<std::vector<T>> const & data, std::string const & elementName, std::string const & listPropertyName)
+   [Reason]
+   There was no wrapper for adding data to element list properties in a smooth way
 
-  [Changed]
-  void PLYData::addElementColors
-  (std::string const& elementName, std::vector<std::array<unsigned char, 3>>& colors)
-  [InsteadOf]
-  void PLYData::addVertexColors
-  (std::vector<std::array<unsigned char, 3>>& colors)
-  [Reason]
-  More general version of the same function that can set colors to any element and not only to vertices
+   [Changed]
+   void PLYData::addElementColors
+   (std::string const& elementName, std::vector<std::array<double, 3>>& colors)
+   [InsteadOf]
+   void PLYData::addVertexColors
+   (std::vector<std::array<double, 3>>& colors)
+   [Reason]
+   More general version of the same function that can set colors to any element and not only to vertices
 
-  [Changed]
-  void PLYData::addVertexPositions
-  (std::vector<std::array<PositionT, 3>>& vertexPositions)
-  [InsteadOf]
-  void PLYData::addVertexPositions
-  (std::vector<std::array<double, 3>>& vertexPositions)
-  [Reason]
-  This allows for float and double positions instead of only double ones
+   [Changed]
+   void PLYData::addElementColors
+   (std::string const& elementName, std::vector<std::array<unsigned char, 3>>& colors)
+   [InsteadOf]
+   void PLYData::addVertexColors
+   (std::vector<std::array<unsigned char, 3>>& colors)
+   [Reason]
+   More general version of the same function that can set colors to any element and not only to vertices
 
-  [Fixed C4702]
-  S* addressIfSame
-  (T&, char)
+   [Changed]
+   void PLYData::addVertexPositions
+   (std::vector<std::array<PositionT, 3>>& vertexPositions)
+   [InsteadOf]
+   void PLYData::addVertexPositions
+   (std::vector<std::array<double, 3>>& vertexPositions)
+   [Reason]
+   This allows for float and double positions instead of only double ones
 
-*/
+   [Fixed C4702]
+   S* addressIfSame
+   (T&, char)
+
+   [Added]
+   template<typename T> bool PLYData::hasElementPropertyType
+   (const std::string & elementName, const std::string & propertyName)
+   [Reason]
+   There was no smooth way to check if an element with property of type T exists
+
+   [Added]
+   template<typename T> bool PLYData::hasElementListPropertyType
+   (const std::string & elementName, const std::string & listPropertyName)
+   [Reason]
+   There was no smooth way to check if an element with list property of type T exists
+
+   [Added]
+   bool PLYData::hasDoublePrecisionVertices()
+   [Reason]
+   Allows for a check if the vertices are stored with double precision
+
+   [Added]
+   bool PLYData::hasDoublePrecisionNormals()
+   [Reason]
+   Allows for a check if the normals are stored with double precision
+
+ */
 // clang-format on
 
 #include <array>
 #include <cctype>
+#include <climits>
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -138,7 +161,6 @@ SOFTWARE.
 #include <string>
 #include <type_traits>
 #include <vector>
-#include <climits>
 
 // General namespace wrapping all Happly things.
 namespace happly {
@@ -149,48 +171,125 @@ enum class DataFormat { ASCII, Binary, BinaryBigEndian };
 
 // Type name strings
 // clang-format off
-template <typename T> std::string typeName()                { return "unknown"; }
-template<> inline std::string typeName<int8_t>()            { return "char";    }
-template<> inline std::string typeName<uint8_t>()           { return "uchar";   }
-template<> inline std::string typeName<int16_t>()           { return "short";   }
-template<> inline std::string typeName<uint16_t>()          { return "ushort";  }
-template<> inline std::string typeName<int32_t>()           { return "int";     }
-template<> inline std::string typeName<uint32_t>()          { return "uint";    }
-template<> inline std::string typeName<float>()             { return "float";   }
-template<> inline std::string typeName<double>()            { return "double";  }
+	template <typename T> std::string typeName()
+	{
+		return "unknown";
+	}
+	template<> inline std::string typeName<int8_t>()
+	{
+		return "char";
+	}
+	template<> inline std::string typeName<uint8_t>()
+	{
+		return "uchar";
+	}
+	template<> inline std::string typeName<int16_t>()
+	{
+		return "short";
+	}
+	template<> inline std::string typeName<uint16_t>()
+	{
+		return "ushort";
+	}
+	template<> inline std::string typeName<int32_t>()
+	{
+		return "int";
+	}
+	template<> inline std::string typeName<uint32_t>()
+	{
+		return "uint";
+	}
+	template<> inline std::string typeName<float>()
+	{
+		return "float";
+	}
+	template<> inline std::string typeName<double>()
+	{
+		return "double";
+	}
 
-// Template hackery that makes getProperty<T>() and friends pretty while automatically picking up smaller types
-namespace {
+	// Template hackery that makes getProperty<T>() and friends pretty while automatically picking up smaller types
+	namespace
+	{
 
-// A pointer for the equivalent/smaller equivalent of a type (eg. when a double is requested a float works too, etc)
-// long int is intentionally absent to avoid platform confusion
-template <class T> struct TypeChain                 { bool hasChildType = false;   typedef T            type; };
-template <> struct TypeChain<int64_t>               { bool hasChildType = true;    typedef int32_t      type; };
-template <> struct TypeChain<int32_t>               { bool hasChildType = true;    typedef int16_t      type; };
-template <> struct TypeChain<int16_t>               { bool hasChildType = true;    typedef int8_t       type; };
-template <> struct TypeChain<uint64_t>              { bool hasChildType = true;    typedef uint32_t     type; };
-template <> struct TypeChain<uint32_t>              { bool hasChildType = true;    typedef uint16_t     type; };
-template <> struct TypeChain<uint16_t>              { bool hasChildType = true;    typedef uint8_t      type; };
-template <> struct TypeChain<double>                { bool hasChildType = true;    typedef float        type; };
+		// A pointer for the equivalent/smaller equivalent of a type (eg. when a double is requested a float works too, etc)
+		// long int is intentionally absent to avoid platform confusion
+		template <class T> struct TypeChain
+		{
+			bool hasChildType = false;   typedef T            type;
+		};
+		template <> struct TypeChain<int64_t>
+		{
+			bool hasChildType = true;    typedef int32_t      type;
+		};
+		template <> struct TypeChain<int32_t>
+		{
+			bool hasChildType = true;    typedef int16_t      type;
+		};
+		template <> struct TypeChain<int16_t>
+		{
+			bool hasChildType = true;    typedef int8_t       type;
+		};
+		template <> struct TypeChain<uint64_t>
+		{
+			bool hasChildType = true;    typedef uint32_t     type;
+		};
+		template <> struct TypeChain<uint32_t>
+		{
+			bool hasChildType = true;    typedef uint16_t     type;
+		};
+		template <> struct TypeChain<uint16_t>
+		{
+			bool hasChildType = true;    typedef uint8_t      type;
+		};
+		template <> struct TypeChain<double>
+		{
+			bool hasChildType = true;    typedef float        type;
+		};
 
-template <class T> struct CanonicalName                     { typedef T         type; };
-template <> struct CanonicalName<char>                      { typedef int8_t    type; };
-template <> struct CanonicalName<unsigned char>             { typedef uint8_t   type; };
-template <> struct CanonicalName<size_t>                    { typedef std::conditional<std::is_same<std::make_signed<size_t>::type, int>::value, uint32_t, uint64_t>::type type; };
+		template <class T> struct CanonicalName
+		{
+			typedef T         type;
+		};
+		template <> struct CanonicalName<char>
+		{
+			typedef int8_t    type;
+		};
+		template <> struct CanonicalName<unsigned char>
+		{
+			typedef uint8_t   type;
+		};
+		template <> struct CanonicalName<size_t>
+		{
+			typedef std::conditional<std::is_same<std::make_signed<size_t>::type, int>::value, uint32_t, uint64_t>::type type;
+		};
 
-// Used to change behavior of >> for 8bit ints, which does not do what we want.
-template <class T> struct SerializeType                 { typedef T         type; };
-template <> struct SerializeType<uint8_t>               { typedef int32_t   type; };
-template <> struct SerializeType< int8_t>               { typedef int32_t   type; };
+		// Used to change behavior of >> for 8bit ints, which does not do what we want.
+		template <class T> struct SerializeType
+		{
+			typedef T         type;
+		};
+		template <> struct SerializeType<uint8_t>
+		{
+			typedef int32_t   type;
+		};
+		template <> struct SerializeType< int8_t>
+		{
+			typedef int32_t   type;
+		};
 
-// Give address only if types are same (used below when conditionally copying data)
-// last int/char arg is to resolve ambiguous overloads, just always pass 0 and the int version will be preferred
-template <typename S, typename T>
-S* addressIfSame(T&, char) {
-  throw std::runtime_error("tried to take address for types that are not same");
-}
-template <typename S>
-S* addressIfSame(S& t, int) {return &t;}
+		// Give address only if types are same (used below when conditionally copying data)
+		// last int/char arg is to resolve ambiguous overloads, just always pass 0 and the int version will be preferred
+		template <typename S, typename T>
+		S * addressIfSame(T &, char)
+		{
+			throw std::runtime_error("tried to take address for types that are not same");
+		}
+		template <typename S>
+		S * addressIfSame(S & t, int)
+		{
+			return &t;
+		}
 
 // clang-format on
 } // namespace
@@ -319,8 +418,14 @@ T swapEndian(T val) {
 }
 
 // The following specializations for single-byte types are used to avoid compiler warnings.
-template <> int8_t swapEndian<int8_t>(int8_t val) { return val; }
-template <> uint8_t swapEndian<uint8_t>(uint8_t val) { return val; }
+template <>
+int8_t swapEndian<int8_t>(int8_t val) {
+  return val;
+}
+template <>
+uint8_t swapEndian<uint8_t>(uint8_t val) {
+  return val;
+}
 
 
 // Unpack flattened list from the convention used in TypedListProperty
@@ -1564,6 +1669,47 @@ public:
 
   // === Common-case helpers
 
+  /**
+   * @brief check if an element with a property of type T exists
+   *
+   * @param elementName The element name to use
+   * @param propertyName The property name to use
+   *
+   * @return true if element exists and false if it does not exist
+   */
+  template <typename T>
+  bool hasElementPropertyType(const std::string& elementName, const std::string& propertyName) {
+    if (!hasElement(elementName)) return false;
+    return getElement(elementName).hasPropertyType<T>(propertyName);
+  }
+
+  /**
+   * @brief check if an element with a property of type T exists
+   *
+   * @param elementName The element name to use
+   * @param propertyName The property name to use
+   *
+   * @return true if element exists and false if it does not exist
+   */
+  template <typename T>
+  bool hasElementListPropertyType(const std::string& elementName, const std::string& listPropertyName) {
+    if (!hasElement(elementName)) return false;
+    return getElement(elementName).hasListPropertyType<T>(listPropertyName);
+  }
+
+  /**
+   * @brief check if the vertices stored are double precision
+   *
+   * @return true if "vertex"."x" is of type double
+   */
+  bool hasDoublePrecisionVertices() { return hasElementPropertyType<double>("vertex", "x"); }
+
+  /**
+   * @brief check if the normals stored are double precision
+   *
+   * @return true if "vertex"."nx" is of type double
+   */
+  bool hasDoublePrecisionNormals() { return hasElementPropertyType<double>("vertex", "nx"); }
 
   /**
    * @brief Common-case helper get mesh vertex positions
@@ -1572,13 +1718,14 @@ public:
    *
    * @return A vector of vertex positions.
    */
-  std::vector<std::array<double, 3>> getVertexPositions(const std::string& vertexElementName = "vertex") {
+  template <typename PositionT>
+  std::vector<std::array<PositionT, 3>> getVertexPositions(const std::string& vertexElementName = "vertex") {
 
-    std::vector<double> xPos = getElement(vertexElementName).getProperty<double>("x");
-    std::vector<double> yPos = getElement(vertexElementName).getProperty<double>("y");
-    std::vector<double> zPos = getElement(vertexElementName).getProperty<double>("z");
+    std::vector<PositionT> xPos = getElement(vertexElementName).getProperty<PositionT>("x");
+    std::vector<PositionT> yPos = getElement(vertexElementName).getProperty<PositionT>("y");
+    std::vector<PositionT> zPos = getElement(vertexElementName).getProperty<PositionT>("z");
 
-    std::vector<std::array<double, 3>> result(xPos.size());
+    std::vector<std::array<PositionT, 3>> result(xPos.size());
     for (size_t i = 0; i < result.size(); i++) {
       result[i][0] = xPos[i];
       result[i][1] = yPos[i];
@@ -1595,13 +1742,14 @@ public:
    *
    * @return A vector of vertex normals.
    */
-  std::vector<std::array<double, 3>> getVertexNormals(const std::string& vertexElementName = "vertex") {
+  template <typename PositionT>
+  std::vector<std::array<PositionT, 3>> getVertexNormals(const std::string& vertexElementName = "vertex") {
 
-    std::vector<double> xNormal = getElement(vertexElementName).getProperty<double>("nx");
-    std::vector<double> yNormal = getElement(vertexElementName).getProperty<double>("ny");
-    std::vector<double> zNormal = getElement(vertexElementName).getProperty<double>("nz");
+    std::vector<PositionT> xNormal = getElement(vertexElementName).getProperty<PositionT>("nx");
+    std::vector<PositionT> yNormal = getElement(vertexElementName).getProperty<PositionT>("ny");
+    std::vector<PositionT> zNormal = getElement(vertexElementName).getProperty<PositionT>("nz");
 
-    std::vector<std::array<double, 3>> result(xNormal.size());
+    std::vector<std::array<PositionT, 3>> result(xNormal.size());
     for (size_t i = 0; i < result.size(); i++) {
       result[i][0] = xNormal[i];
       result[i][1] = yNormal[i];
@@ -1655,7 +1803,6 @@ public:
     }
     throw std::runtime_error("PLY parser: could not find face vertex indices attribute under any common name.");
   }
-
 
   /**
    * @brief Common-case helper set mesh vertex positons. Creates vertex element, if necessary.
@@ -1784,7 +1931,7 @@ public:
    * @param colors A vector of vertex colors (unsigned chars [0,255]).
    */
   void addElementColors(std::string const& elementName, std::vector<std::array<unsigned char, 3>>& colors) {
-    
+
     size_t N = colors.size();
 
     // Create the element
@@ -2052,7 +2199,7 @@ private:
         // Some .ply files seem to include empty lines before the start of property data (though this is not specified
         // in the format description). We attempt to recover and parse such files by skipping any empty lines.
         if (!elem.properties.empty()) { // if the element has no properties, the line _should_ be blank, presumably
-          while (line.empty()) { // skip lines until we hit something nonempty
+          while (line.empty()) {        // skip lines until we hit something nonempty
             std::getline(inStream, line);
           }
         }

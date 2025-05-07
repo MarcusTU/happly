@@ -81,3 +81,25 @@ This allows for float and double positions instead of only double ones
 [Fixed C4702]
 `S* addressIfSame`
 `(T&, char)`
+
+[Added]
+`template<typename T> bool PLYData::hasElementPropertyType`
+`(const std::string & elementName, const std::string & propertyName)`
+[Reason]
+There was no smooth way to check if an element with property of type T exists
+
+[Added]
+`template<typename T> bool PLYData::hasElementListPropertyType`
+`(const std::string & elementName, const std::string & listPropertyName)`
+[Reason]
+There was no smooth way to check if an element with list property of type T exists
+
+[Added]
+`bool PLYData::hasDoublePrecisionVertices``()`
+[Reason]
+Allows for a check if the vertices are stored with double precision
+
+[Added]
+`bool PLYData::hasDoublePrecisionNormals``()`
+[Reason]
+Allows for a check if the normals are stored with double precision
