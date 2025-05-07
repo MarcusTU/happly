@@ -45,6 +45,86 @@ SOFTWARE.
   - Version 2 (July 20, 2019)     Catch exceptions by const reference.
   - Version 1 (undated)           Initial version. Unnamed changes before version numbering.
 
+
+ === Fork log by MarcusTU ===
+
+  [Initial copy of nmwsharp/happly]
+
+  [Changes from 07.05.2025 by MarcusTU]
+
+  [Added]
+  bool Element::hasListPropertyType
+  (const std::string& target)
+  [Reason]
+  There was no analogon to hasPropertyType for list properties
+
+  [Added]
+  std::string PLYData::getPropertyTypeName
+  (const std::string & propertyName)
+  [Reason]
+  There was no possibility to get the property type name from the outside
+
+  [Added]
+  bool Element::isListProperty
+  (const std::string & propertyName)
+  [Reason]
+  There was no possibility to check if a property is a list property from the outside
+
+  [Added]
+  std::vector<std::array<double, 3>> PLYData::getVertexNormals
+  (const std::string& vertexElementName = "vertex")
+  [Reason]
+  There is a wrapper for positions (getVertexPositions) but the one for normals was missing
+
+  [Added]
+  void PLYData::addElementNormals
+  (std::string const& elementName, std::vector<std::array<PositionT, 3>>& elementNormals)
+  [Reason]
+  There is a wrapper for positions (addVertexPositions) but the one for normals was missing
+
+  [Added]
+  void PLYData::addElementProperty
+  (std::vector<T> const & data, std::string const & elementName, std::string const & propertyName)
+  [Reason]
+  There was no wrapper for adding data to element properties in a smooth way
+		
+  [Added]
+  void PLYData::addElementListProperty
+  (std::vector<std::vector<T>> const & data, std::string const & elementName, std::string const & listPropertyName)
+  [Reason]
+  There was no wrapper for adding data to element list properties in a smooth way
+
+  [Changed]
+  void PLYData::addElementColors
+  (std::string const& elementName, std::vector<std::array<double, 3>>& colors)
+  [InsteadOf]
+  void PLYData::addVertexColors
+  (std::vector<std::array<double, 3>>& colors)
+  [Reason]
+  More general version of the same function that can set colors to any element and not only to vertices
+
+  [Changed]
+  void PLYData::addElementColors
+  (std::string const& elementName, std::vector<std::array<unsigned char, 3>>& colors)
+  [InsteadOf]
+  void PLYData::addVertexColors
+  (std::vector<std::array<unsigned char, 3>>& colors)
+  [Reason]
+  More general version of the same function that can set colors to any element and not only to vertices
+
+  [Changed]
+  void PLYData::addVertexPositions
+  (std::vector<std::array<PositionT, 3>>& vertexPositions)
+  [InsteadOf]
+  void PLYData::addVertexPositions
+  (std::vector<std::array<double, 3>>& vertexPositions)
+  [Reason]
+  This allows for float and double positions instead of only double ones
+
+  [Fixed C4702]
+  S* addressIfSame
+  (T&, char)
+
 */
 // clang-format on
 
@@ -108,7 +188,7 @@ template <> struct SerializeType< int8_t>               { typedef int32_t   type
 template <typename S, typename T>
 S* addressIfSame(T&, char) {
   throw std::runtime_error("tried to take address for types that are not same");
-  return nullptr;}
+}
 template <typename S>
 S* addressIfSame(S& t, int) {return &t;}
 
@@ -829,6 +909,28 @@ public:
   }
 
   /**
+   * @brief Check if a list property exists with the requested type.
+   *
+   * @tparam T The type of the property
+   * @param target The name of the property to get.
+   *
+   * @return Whether the target list property exists.
+   */
+  template <class T>
+  bool hasListPropertyType(const std::string& target) {
+    for (std::unique_ptr<Property>& prop : properties) {
+      if (prop->name == target) {
+        TypedListProperty<T>* castedProp = dynamic_cast<TypedListProperty<T>*>(prop.get());
+        if (castedProp) {
+          return true;
+        }
+        return false;
+      }
+    }
+    return false;
+  }
+
+  /**
    * @brief A list of the names of all properties
    *
    * @return Property names
@@ -959,6 +1061,28 @@ public:
     // No match, failure
     throw std::runtime_error("PLY parser: property " + prop->name + " is not of type type " + typeName<T>() +
                              ". Has type " + prop->propertyTypeName());
+  }
+
+  /**
+   * @brief A string naming the type of the property
+   *
+   * @return
+   */
+  std::string getPropertyTypeName(const std::string& propertyName) {
+    return getPropertyPtr(propertyName)->propertyTypeName();
+  }
+
+  /**
+   * @brief check if a typed property is a listProperty
+   *
+   * @return bool
+   */
+  template <class T>
+  bool isListProperty(const std::string& propertyName) {
+    std::unique_ptr<Property>& prop = getPropertyPtr(propertyName);
+    TypedListProperty<T>* castedProp = dynamic_cast<TypedListProperty<T>*>(prop.get());
+    if (castedProp) return true;
+    return false;
   }
 
   /**
@@ -1465,6 +1589,29 @@ public:
   }
 
   /**
+   * @brief Common-case helper get mesh vertex normals
+   *
+   * @param vertexElementName The element name to use (default: "vertex")
+   *
+   * @return A vector of vertex normals.
+   */
+  std::vector<std::array<double, 3>> getVertexNormals(const std::string& vertexElementName = "vertex") {
+
+    std::vector<double> xNormal = getElement(vertexElementName).getProperty<double>("nx");
+    std::vector<double> yNormal = getElement(vertexElementName).getProperty<double>("ny");
+    std::vector<double> zNormal = getElement(vertexElementName).getProperty<double>("nz");
+
+    std::vector<std::array<double, 3>> result(xNormal.size());
+    for (size_t i = 0; i < result.size(); i++) {
+      result[i][0] = xNormal[i];
+      result[i][1] = yNormal[i];
+      result[i][2] = zNormal[i];
+    }
+
+    return result;
+  }
+
+  /**
    * @brief Common-case helper get mesh vertex colors
    *
    * @param vertexElementName The element name to use (default: "vertex")
@@ -1515,7 +1662,8 @@ public:
    *
    * @param vertexPositions A vector of vertex positions
    */
-  void addVertexPositions(std::vector<std::array<double, 3>>& vertexPositions) {
+  template <typename PositionT>
+  void addVertexPositions(std::vector<std::array<PositionT, 3>>& vertexPositions) {
 
     std::string vertexName = "vertex";
     size_t N = vertexPositions.size();
@@ -1526,9 +1674,9 @@ public:
     }
 
     // De-interleave
-    std::vector<double> xPos(N);
-    std::vector<double> yPos(N);
-    std::vector<double> zPos(N);
+    std::vector<PositionT> xPos(N);
+    std::vector<PositionT> yPos(N);
+    std::vector<PositionT> zPos(N);
     for (size_t i = 0; i < vertexPositions.size(); i++) {
       xPos[i] = vertexPositions[i][0];
       yPos[i] = vertexPositions[i][1];
@@ -1536,55 +1684,76 @@ public:
     }
 
     // Store
-    getElement(vertexName).addProperty<double>("x", xPos);
-    getElement(vertexName).addProperty<double>("y", yPos);
-    getElement(vertexName).addProperty<double>("z", zPos);
+    getElement(vertexName).addProperty<PositionT>("x", xPos);
+    getElement(vertexName).addProperty<PositionT>("y", yPos);
+    getElement(vertexName).addProperty<PositionT>("z", zPos);
   }
 
   /**
-   * @brief Common-case helper set mesh vertex colors. Creates a vertex element, if necessary.
+   * @brief Common-case helper to set mesh vertex/face/etc. normals. Creates element, if necessary.
    *
-   * @param colors A vector of vertex colors (unsigned chars [0,255]).
+   * @param vertexNormals A vector of vertex positions
    */
-  void addVertexColors(std::vector<std::array<unsigned char, 3>>& colors) {
+  template <typename PositionT>
+  void addElementNormals(std::string const& elementName, std::vector<std::array<PositionT, 3>>& elementNormals) {
 
-    std::string vertexName = "vertex";
-    size_t N = colors.size();
+    size_t N = elementNormals.size();
 
     // Create the element
-    if (!hasElement(vertexName)) {
-      addElement(vertexName, N);
+    if (!hasElement(elementName)) {
+      addElement(elementName, N);
     }
 
     // De-interleave
-    std::vector<unsigned char> r(N);
-    std::vector<unsigned char> g(N);
-    std::vector<unsigned char> b(N);
-    for (size_t i = 0; i < colors.size(); i++) {
-      r[i] = colors[i][0];
-      g[i] = colors[i][1];
-      b[i] = colors[i][2];
+    std::vector<PositionT> xNormal(N);
+    std::vector<PositionT> yNormal(N);
+    std::vector<PositionT> zNormal(N);
+    for (size_t i = 0; i < elementNormals.size(); i++) {
+      xNormal[i] = elementNormals[i][0];
+      yNormal[i] = elementNormals[i][1];
+      zNormal[i] = elementNormals[i][2];
     }
-
     // Store
-    getElement(vertexName).addProperty<unsigned char>("red", r);
-    getElement(vertexName).addProperty<unsigned char>("green", g);
-    getElement(vertexName).addProperty<unsigned char>("blue", b);
+    getElement(elementName).addProperty<PositionT>("nx", xNormal);
+    getElement(elementName).addProperty<PositionT>("ny", yNormal);
+    getElement(elementName).addProperty<PositionT>("nz", zNormal);
   }
 
   /**
-   * @brief Common-case helper set mesh vertex colors. Creates a vertex element, if necessary.
+   * @brief Add vector<T> with elementName and propertyName. Adds element if it does not exist.
+   *
+   * @param colors A vector of vertex colors (unsigned chars [0,255]).
+   */
+  template <typename T>
+  void addElementProperty(std::vector<T> const& data, std::string const& elementName, std::string const& propertyName) {
+    if (!hasElement(elementName)) addElement(elementName, data.size());
+    getElement(elementName).addProperty(propertyName, data);
+  }
+
+  /**
+   * @brief Add vector<vector<T>> with elementName and listPropertyName. Adds element if it does not exist.
+   *
+   * @param colors A vector of vertex colors (unsigned chars [0,255]).
+   */
+  template <typename T>
+  void addElementListProperty(std::vector<std::vector<T>> const& data, std::string const& elementName,
+                              std::string const& listPropertyName) {
+    if (!hasElement(elementName)) addElement(elementName, data.size());
+    getElement(elementName).addListProperty(listPropertyName, data);
+  }
+
+  /**
+   * @brief Common-case helper set mesh element colors. Creates the element, if necessary.
    *
    * @param colors A vector of vertex colors as floating point [0,1] values. Internally converted to [0,255] chars.
    */
-  void addVertexColors(std::vector<std::array<double, 3>>& colors) {
+  void addElementColors(std::string const& elementName, std::vector<std::array<double, 3>>& colors) {
 
-    std::string vertexName = "vertex";
     size_t N = colors.size();
 
     // Create the element
-    if (!hasElement(vertexName)) {
-      addElement(vertexName, N);
+    if (!hasElement(elementName)) {
+      addElement(elementName, N);
     }
 
     auto toChar = [](double v) {
@@ -1604,11 +1773,40 @@ public:
     }
 
     // Store
-    getElement(vertexName).addProperty<unsigned char>("red", r);
-    getElement(vertexName).addProperty<unsigned char>("green", g);
-    getElement(vertexName).addProperty<unsigned char>("blue", b);
+    getElement(elementName).addProperty<unsigned char>("red", r);
+    getElement(elementName).addProperty<unsigned char>("green", g);
+    getElement(elementName).addProperty<unsigned char>("blue", b);
   }
 
+  /**
+   * @brief Common-case helper set mesh element colors. Creates the element, if necessary.
+   *
+   * @param colors A vector of vertex colors (unsigned chars [0,255]).
+   */
+  void addElementColors(std::string const& elementName, std::vector<std::array<unsigned char, 3>>& colors) {
+    
+    size_t N = colors.size();
+
+    // Create the element
+    if (!hasElement(elementName)) {
+      addElement(elementName, N);
+    }
+
+    // De-interleave
+    std::vector<unsigned char> r(N);
+    std::vector<unsigned char> g(N);
+    std::vector<unsigned char> b(N);
+    for (size_t i = 0; i < colors.size(); i++) {
+      r[i] = colors[i][0];
+      g[i] = colors[i][1];
+      b[i] = colors[i][2];
+    }
+
+    // Store
+    getElement(elementName).addProperty<unsigned char>("red", r);
+    getElement(elementName).addProperty<unsigned char>("green", g);
+    getElement(elementName).addProperty<unsigned char>("blue", b);
+  }
 
   /**
    * @brief Common-case helper to set face indices. Creates a face element if needed. The input type will be casted to a
