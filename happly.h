@@ -2335,7 +2335,7 @@ private:
 
     // Write comments
     bool hasHapplyComment = false;
-    std::string happlyComment = "Written with hapPLY (https://github.com/nmwsharp/happly)";
+    std::string happlyComment = "Written with a fork of hapPLY (https://github.com/MarcusTU/happly)";
     for (const std::string& comment : comments) {
       if (comment == happlyComment) hasHapplyComment = true;
       outStream << "comment " << comment << "\n";
