@@ -1,6 +1,6 @@
 #pragma once
 
-/* A header-only implementation of the .ply file format.
+/* A fork of the header-only implementation of the .ply file format.
  * https://github.com/nmwsharp/happly
  * By Nicholas Sharp - nsharp@cs.cmu.edu
  *
@@ -146,6 +146,16 @@ SOFTWARE.
    bool PLYData::hasDoublePrecisionNormals()
    [Reason]
    Allows for a check if the normals are stored with double precision
+  
+   [Added] 13.05.2025
+   bool replaceElement(const std::string & oldName, const std::string & newName, size_t count)
+   [Reason]
+   Functionality missing
+
+   [Added] 14.05.2025
+   bool hasElementProperty(const std::string& elementName, const std::string& propertyName)
+   [Reason]
+   Functionality missing
 
  */
 // clang-format on
@@ -1629,6 +1639,24 @@ public:
     throw std::runtime_error("PLY parser: no element with name: " + target);
   }
 
+  /**
+   * @brief Replace an existing element with a new one
+   *
+   * @param oldName The old element name
+   * @param newName The new element name
+   * @param count The number of elements of this type.
+   *
+   * @return True if exists.
+   */
+  bool replaceElement(const std::string& oldName, const std::string& newName, size_t count) {
+    for (Element& e : elements) {
+      if (e.name == oldName) {
+        e = Element(newName, count);
+        return true;
+      }
+    }
+    return false;
+  }
 
   /**
    * @brief Check if an element type exists
@@ -1642,6 +1670,19 @@ public:
       if (e.name == target) return true;
     }
     return false;
+  }
+
+  /**
+   * @brief Check if an element with a property exists
+   *
+   * @param elementName The element name to check for.
+   * @param propertyName The property name to check for.
+   *
+   * @return True if exists and false otherwise
+   */
+  bool hasElementProperty(const std::string& elementName, const std::string& propertyName) {
+    if (!hasElement(elementName)) return false;
+    return getElement(elementName).hasProperty(propertyName);
   }
 
 
